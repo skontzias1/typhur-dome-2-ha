@@ -1,0 +1,96 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Typhur Dome 2",
+        "description": "Enter your Typhur account credentials.",
+        "data": {
+          "email": "Email address",
+          "password": "Password",
+          "region": "Region"
+        },
+        "data_description": {
+          "region": "Select **US** for accounts created at typhur.com; **EU** for accounts created at typhur.de."
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid email or password.",
+      "cannot_connect": "Could not connect to the Typhur cloud. Check your internet connection.",
+      "no_devices": "No Typhur devices found on this account.",
+      "unknown": "Unexpected error — check the Home Assistant logs."
+    },
+    "abort": {
+      "already_configured": "This Typhur account is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "status": {
+        "name": "Status",
+        "state": {
+          "offline": "Offline",
+          "standby": "Standby",
+          "cooking": "Cooking",
+          "paused": "Paused",
+          "basket_open": "Basket open",
+          "done": "Done",
+          "preheating": "Preheating"
+        }
+      },
+      "cooking_mode": {
+        "name": "Cooking mode"
+      },
+      "cooking_state": {
+        "name": "Cooking state",
+        "state": {
+          "idle": "Idle",
+          "preheating": "Preheating",
+          "preheat_ready": "Preheat ready",
+          "cooking": "Cooking",
+          "paused": "Paused",
+          "done": "Done",
+          "cooling": "Cooling"
+        }
+      },
+      "top_temperature": {
+        "name": "Top temperature"
+      },
+      "bottom_temperature": {
+        "name": "Bottom temperature"
+      },
+      "target_temperature": {
+        "name": "Target temperature"
+      },
+      "remaining_time": {
+        "name": "Remaining time"
+      },
+      "elapsed_time": {
+        "name": "Elapsed time"
+      },
+      "total_cook_time": {
+        "name": "Total cook time"
+      },
+      "preheat_remaining": {
+        "name": "Preheat remaining"
+      },
+      "cooking_stage": {
+        "name": "Cooking stage"
+      }
+    },
+    "binary_sensor": {
+      "cooking": {
+        "name": "Cooking"
+      },
+      "basket": {
+        "name": "Basket"
+      },
+      "error": {
+        "name": "Error"
+      },
+      "preheating": {
+        "name": "Preheating"
+      }
+    }
+  }
+}

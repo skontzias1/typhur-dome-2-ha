@@ -1,0 +1,15 @@
+{
+  "domain": "typhur",
+  "name": "Typhur Dome 2",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/skontzias/typhur-dome-2-ha",
+  "integration_type": "device",
+  "iot_class": "cloud_push",
+  "loggers": ["typhur"],
+  "requirements": [
+    "paho-mqtt>=1.6.1",
+    "cryptography>=38.0.0"
+  ],
+  "version": "0.1.0"
+}
