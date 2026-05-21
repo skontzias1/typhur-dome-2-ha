@@ -3,7 +3,7 @@
   "name": "Typhur Dome 2",
   "codeowners": [],
   "config_flow": true,
-  "documentation": "https://github.com/skontzias/typhur-dome-2-ha",
+  "documentation": "https://github.com/skontzias1/typhur-dome-2-ha",
   "integration_type": "device",
   "iot_class": "cloud_push",
   "loggers": ["typhur"],

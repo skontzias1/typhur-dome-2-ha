@@ -1,7 +1,7 @@
 # Typhur Dome 2 — Home Assistant Integration
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![GitHub Release](https://img.shields.io/github/release/skontzias/typhur-dome-2-ha.svg)](https://github.com/skontzias/typhur-dome-2-ha/releases)
+[![GitHub Release](https://img.shields.io/github/release/skontzias1/typhur-dome-2-ha.svg)](https://github.com/skontzias1/typhur-dome-2-ha/releases)
 
 > **This is not an official Typhur integration.**
 > It is an independent, community-developed project with no affiliation with or endorsement from Typhur.
@@ -73,7 +73,7 @@ Other Typhur devices (Sync thermometers, etc.) use the same cloud stack but are 
 ### Via HACS (recommended)
 
 1. Open HACS → **Integrations** → ⋮ → **Custom repositories**
-2. Add `https://github.com/skontzias/typhur-dome-2-ha` with category **Integration**
+2. Add `https://github.com/skontzias1/typhur-dome-2-ha` with category **Integration**
 3. Search for **Typhur Dome 2** and install
 4. Restart Home Assistant
 
@@ -155,7 +155,7 @@ The following mappings were established from live captures of a Typhur Dome 2. T
 - **`cookingMode` integers 2–14** (Roast, Bake, Broil, etc.) — ordered to match the Dome 2 UI but not yet confirmed by live capture
 - **`cookingState` values 1, 2, 5, 6** — inferred from context; only 0 (paused), 3 (cooking), and 4 (done) are confirmed
 
-If you observe unexpected state labels, please [open an issue](https://github.com/skontzias/typhur-dome-2-ha/issues) with the raw MQTT payload from the probe script.
+If you observe unexpected state labels, please [open an issue](https://github.com/skontzias1/typhur-dome-2-ha/issues) with the raw MQTT payload from the probe script.
 
 ---
 
