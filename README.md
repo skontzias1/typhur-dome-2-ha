@@ -23,6 +23,40 @@ Other Typhur devices (Sync thermometers, etc.) use the same cloud stack but are 
 
 ---
 
+## Installation
+
+### Via HACS (recommended)
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=skontzias1&repository=typhur-dome-2-ha&category=integration)
+
+1. Click the button above, or open HACS → **Integrations** → ⋮ → **Custom repositories** and add `https://github.com/skontzias1/typhur-dome-2-ha` with category **Integration**
+2. Search for **Typhur Dome 2** and install
+3. Restart Home Assistant
+
+### Manual
+
+1. Download the latest release
+2. Copy the `custom_components/typhur/` directory into your HA `/config/custom_components/typhur/`
+3. Restart Home Assistant
+
+---
+
+## Configuration
+
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=typhur)
+
+1. Click the button above, or go to **Settings → Devices & Services → Add integration**
+2. Search for **Typhur Dome 2**
+3. Enter your Typhur account credentials:
+   - **Email** — the email address you registered with in the Typhur app
+   - **Password** — your Typhur account password
+   - **Region** — `us` for accounts created at typhur.com · `eu` for typhur.de
+4. Click **Submit**
+
+HA will log in, discover your devices, and start listening for updates. All entities appear under **Settings → Devices & Services → Typhur Dome 2**.
+
+---
+
 ## Features
 
 - **~2-second real-time updates** while cooking (cloud MQTT push)
@@ -65,40 +99,6 @@ Other Typhur devices (Sync thermometers, etc.) use the same cloud stack but are 
 - **Typhur account** with the Dome 2 paired in the Typhur mobile app
 - **Internet connectivity** from your Home Assistant host — cloud access is mandatory; there is no local mode
 - Python packages `paho-mqtt>=1.6.1` and `cryptography>=38.0.0` (installed automatically by HA)
-
----
-
-## Installation
-
-### Via HACS (recommended)
-
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=skontzias1&repository=typhur-dome-2-ha&category=integration)
-
-1. Click the button above, or open HACS → **Integrations** → ⋮ → **Custom repositories** and add `https://github.com/skontzias1/typhur-dome-2-ha` with category **Integration**
-2. Search for **Typhur Dome 2** and install
-3. Restart Home Assistant
-
-### Manual
-
-1. Download the latest release
-2. Copy the `custom_components/typhur/` directory into your HA `/config/custom_components/typhur/`
-3. Restart Home Assistant
-
----
-
-## Configuration
-
-[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=typhur)
-
-1. Click the button above, or go to **Settings → Devices & Services → Add integration**
-2. Search for **Typhur Dome 2**
-3. Enter your Typhur account credentials:
-   - **Email** — the email address you registered with in the Typhur app
-   - **Password** — your Typhur account password
-   - **Region** — `us` for accounts created at typhur.com · `eu` for typhur.de
-4. Click **Submit**
-
-HA will log in, discover your devices, and start listening for updates. All entities appear under **Settings → Devices & Services → Typhur Dome 2**.
 
 ---
 
