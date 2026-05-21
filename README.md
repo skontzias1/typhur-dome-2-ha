@@ -72,10 +72,11 @@ Other Typhur devices (Sync thermometers, etc.) use the same cloud stack but are 
 
 ### Via HACS (recommended)
 
-1. Open HACS → **Integrations** → ⋮ → **Custom repositories**
-2. Add `https://github.com/skontzias1/typhur-dome-2-ha` with category **Integration**
-3. Search for **Typhur Dome 2** and install
-4. Restart Home Assistant
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=skontzias1&repository=typhur-dome-2-ha&category=integration)
+
+1. Click the button above, or open HACS → **Integrations** → ⋮ → **Custom repositories** and add `https://github.com/skontzias1/typhur-dome-2-ha` with category **Integration**
+2. Search for **Typhur Dome 2** and install
+3. Restart Home Assistant
 
 ### Manual
 
@@ -87,7 +88,9 @@ Other Typhur devices (Sync thermometers, etc.) use the same cloud stack but are 
 
 ## Configuration
 
-1. Go to **Settings → Devices & Services → Add integration**
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=typhur)
+
+1. Click the button above, or go to **Settings → Devices & Services → Add integration**
 2. Search for **Typhur Dome 2**
 3. Enter your Typhur account credentials:
    - **Email** — the email address you registered with in the Typhur app
