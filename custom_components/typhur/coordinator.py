@@ -320,7 +320,9 @@ class TyphurCoordinator(DataUpdateCoordinator[dict[str, TyphurDeviceState]]):
             on_connected=self._handle_mqtt_connected,
             on_disconnected=self._handle_mqtt_disconnected,
         )
-        self._mqtt.start()
+        # start() writes cert files and calls paho's tls_set() (blocking cert
+        # loading) — run it in an executor so it never blocks the event loop.
+        await self.hass.async_add_executor_job(self._mqtt.start)
 
     def _handle_mqtt_connected(self) -> None:
         self._mqtt_connected = True
@@ -353,7 +355,11 @@ class TyphurCoordinator(DataUpdateCoordinator[dict[str, TyphurDeviceState]]):
                 self._cert_refreshed_at = time.monotonic()
                 if self._mqtt:
                     topics = [t for dev in self._devices for t in dev.sub_topics]
-                    self._mqtt.update_credentials(self._creds, topics)
+                    # update_credentials() rebuilds the client (cert writes +
+                    # tls_set) — keep that blocking work off the event loop too.
+                    await self.hass.async_add_executor_job(
+                        self._mqtt.update_credentials, self._creds, topics
+                    )
                 self._reconnect_delay = MQTT_INITIAL_RECONNECT_DELAY
             except Exception as err:  # noqa: BLE001
                 self._reconnect_delay = min(
