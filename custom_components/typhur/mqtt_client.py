@@ -11,7 +11,6 @@ from collections.abc import Callable
 from typing import Any
 
 from .api import MqttCredentials
-from .const import MQTT_INITIAL_RECONNECT_DELAY, MQTT_MAX_RECONNECT_DELAY
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,7 +44,6 @@ class TyphurMqttClient:
 
         self._client = None
         self._connected = False
-        self._reconnect_delay = MQTT_INITIAL_RECONNECT_DELAY
         self._tmpdir: tempfile.TemporaryDirectory | None = None
 
     # ── Public API ────────────────────────────────────────────────────────
@@ -63,6 +61,14 @@ class TyphurMqttClient:
     def stop(self) -> None:
         """Disconnect and stop the background thread."""
         if self._client:
+            # Detach callbacks BEFORE tearing down. Otherwise the disconnect()
+            # we are about to call fires on_disconnect → on_disconnected, which
+            # schedules another reconnect that calls stop() again … an infinite
+            # "Normal disconnection" storm. A stop is intentional: it must not
+            # look like a connection we should recover.
+            self._client.on_connect = None
+            self._client.on_disconnect = None
+            self._client.on_message = None
             self._client.loop_stop()
             try:
                 self._client.disconnect()
@@ -170,7 +176,6 @@ class TyphurMqttClient:
 
     def _handle_connected(self, client) -> None:
         self._connected = True
-        self._reconnect_delay = MQTT_INITIAL_RECONNECT_DELAY
         _LOGGER.info(
             "Typhur MQTT connected to %s:%s", self._creds.endpoint, self._creds.port
         )
@@ -181,15 +186,18 @@ class TyphurMqttClient:
             self._loop.call_soon_threadsafe(self._on_connected)
 
     def _handle_disconnected(self, reason) -> None:
+        # Only notify (and warn) on a real connected → disconnected transition.
+        # paho's loop_start auto-reconnect can fire on_disconnect repeatedly
+        # while the link is already down; without this guard each retry would
+        # re-trigger the coordinator's reconnect and flood the log.
+        was_connected = self._connected
         self._connected = False
-        _LOGGER.warning("Typhur MQTT disconnected: %s (reconnect in %ss)", reason, self._reconnect_delay)
+        if not was_connected:
+            _LOGGER.debug("Typhur MQTT still disconnected: %s", reason)
+            return
+        _LOGGER.warning("Typhur MQTT disconnected: %s", reason)
         if self._on_disconnected:
             self._loop.call_soon_threadsafe(self._on_disconnected)
-        # paho loop_start handles reconnect automatically; we track the delay
-        # so callers can decide whether to refresh certs before reconnecting.
-        self._reconnect_delay = min(
-            self._reconnect_delay * 2, MQTT_MAX_RECONNECT_DELAY
-        )
 
     def _on_message_cb(self, client, userdata, msg) -> None:
         """Called in paho's thread — dispatch to HA event loop."""

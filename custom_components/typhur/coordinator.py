@@ -17,6 +17,8 @@ from .const import (
     CERT_REFRESH_INTERVAL,
     DOMAIN,
     FALLBACK_POLL_INTERVAL,
+    MQTT_INITIAL_RECONNECT_DELAY,
+    MQTT_MAX_RECONNECT_DELAY,
     TOKEN_REFRESH_INTERVAL,
 )
 from .mqtt_client import TyphurMqttClient
@@ -182,6 +184,10 @@ class TyphurCoordinator(DataUpdateCoordinator[dict[str, TyphurDeviceState]]):
         self._cert_refreshed_at: float = 0.0
         self._mqtt_connected = False
         self._refresh_lock = asyncio.Lock()
+        # Guards against stacking reconnect tasks; owns the real back-off so a
+        # flapping link escalates 5s → 10s → … → 300s instead of busy-looping.
+        self._reconnecting = False
+        self._reconnect_delay = MQTT_INITIAL_RECONNECT_DELAY
 
     # ── Setup / teardown ──────────────────────────────────────────────────
 
@@ -322,21 +328,41 @@ class TyphurCoordinator(DataUpdateCoordinator[dict[str, TyphurDeviceState]]):
 
     def _handle_mqtt_disconnected(self) -> None:
         self._mqtt_connected = False
+        # Never stack reconnect attempts — one in-flight task handles recovery
+        # and re-arms itself only if the link is still down after the back-off.
+        if self._reconnecting:
+            return
+        self._reconnecting = True
         _LOGGER.warning("Typhur: MQTT disconnected — switching to REST polling")
-        # Schedule a cert refresh + reconnect in case certs expired
         self.hass.async_create_task(self._reconnect_mqtt())
 
     async def _reconnect_mqtt(self) -> None:
-        """Refresh certs and reconnect MQTT after a disconnect."""
-        await asyncio.sleep(5)  # brief pause before reconnecting
+        """Refresh certs and rebuild MQTT after a disconnect, with back-off."""
         try:
-            await self._maybe_refresh_token()
-            self._creds = await self._api.async_get_mqtt_certs()
-            self._cert_refreshed_at = time.monotonic()
-        except Exception as err:  # noqa: BLE001
-            _LOGGER.warning("Typhur: cert refresh failed, will retry on next poll: %s", err)
-            return
+            await asyncio.sleep(self._reconnect_delay)
 
-        if self._mqtt:
-            topics = [t for dev in self._devices for t in dev.sub_topics]
-            self._mqtt.update_credentials(self._creds, topics)
+            # paho's loop_start auto-reconnect may have already recovered the
+            # link during the back-off window — if so, don't churn the client.
+            if self._mqtt_connected:
+                self._reconnect_delay = MQTT_INITIAL_RECONNECT_DELAY
+                return
+
+            try:
+                await self._maybe_refresh_token()
+                self._creds = await self._api.async_get_mqtt_certs()
+                self._cert_refreshed_at = time.monotonic()
+                if self._mqtt:
+                    topics = [t for dev in self._devices for t in dev.sub_topics]
+                    self._mqtt.update_credentials(self._creds, topics)
+                self._reconnect_delay = MQTT_INITIAL_RECONNECT_DELAY
+            except Exception as err:  # noqa: BLE001
+                self._reconnect_delay = min(
+                    self._reconnect_delay * 2, MQTT_MAX_RECONNECT_DELAY
+                )
+                _LOGGER.warning(
+                    "Typhur: cert refresh failed, retrying in %ss: %s",
+                    self._reconnect_delay,
+                    err,
+                )
+        finally:
+            self._reconnecting = False
